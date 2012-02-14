@@ -28,5 +28,14 @@ def gettcfromdict(dict1, dict2, residuechoice):
     
     return tcfromdict
 
+def collectbit(dict1, residuechoice):
+    bit = bitarray()
+    for residue in residuechoice:
+        bit.extend(dict1[residue])
+
+    stringbit = str(bit).split("'")[1]
+
+    return stringbit
+
 if __name__ == "__main__":
     print "This code is part of PyPLIF to measure Tanimoto coefficient from reference bit and target bit"

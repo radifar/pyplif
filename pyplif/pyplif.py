@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-import getopt, sys
+import getopt, sys, os
 from openbabel import OBMol, OBConversion
+from optparse import OptionParser
 from time import time
+from glob import glob
 from tanimoto_coef import *
 from ring import *
 from interactions import *
@@ -14,93 +16,114 @@ if __name__ == "__main__":
 
     #  Default configuration
     config    = "config.txt"
-    dl        = "cetirizine.mol2_entry_00001_conf_01.mol2"
-    dp        = "cetirizine.mol2_entry_00001_conf_01_protein.mol2"
-    pbf       = "protein_bindingsite_fixed.mol2"
-    pr        = "H1_site.mol2"
-    lr        = "Doxepin.mol2"
-    multiconf = "no"
 
+    #  Identifiers initialization
+    protein_reference = ""
+    ligand_reference = ""
+    residue_of_choice = []
+    protein_ligand_folder = ""
+    output_file = ""
 
-    options, args = getopt.getopt(sys.argv[1:], '', ['dl=', 'dp=', 'pbf=',
-                    'config=', 'multiconf'])
+    parser = OptionParser()
+    parser.add_option("-c", "--config", dest="config",
+                      help="read config from FILE", metavar="FILE")
+    parser.add_option("-o", "--output", dest="output_file",
+                      help="write result to FILE", metavar="FILE")
+    try:
+        configread  = open(config, 'r')
+    except:
+        print "The config file: '", config, "' can not be found"
+        sys.exit(1)
 
-    for option, value in options:
-        if option == '--dl':
-            dl = value
-        elif option == '--dp':
-            dp = value
-        elif option == '--pbf':
-            pbf = value
-        elif option == '--config':
-            config = value
-        elif option == '--multiconf':
-            multiconf = value
+    configlines = [line for line in configread]
+    configread.close()
 
-    residuechoice = ['ASP107', 'TRP158', 'PHE199', 'TRP428', 'PHE432', 'PHE435']
-    
+    for line in configlines:
+        options = line.split()
+        if not options:
+            continue
+        if options[0] == "protein_reference":
+            protein_reference = options[1]
+        if options[0] == "ligand_reference":
+            ligand_reference = options[1]
+        if options[0] == "residue_of_choice":
+            residue_of_choice = options[1:]
+        if options[0] == "protein_ligand_folder":
+            protein_ligand_folder = options[1]
+        if options[0] == "output_file":
+            output_file = options[1]
+
+    try:
+        os.chdir(protein_ligand_folder)
+        mollisttemp = glob('*conf_01.mol2')
+        mollist = [mol.split('_')[0] for mol in mollisttemp]
+        mollist.sort()
+        os.chdir('..')
+        pbf = protein_ligand_folder + '/protein_bindingsite_fixed.mol2'
+    except:
+        print 'The protein ligand folder can not be found'
+        sys.exit(1)
+            
 
     # opening the molecule files
-    conv1, conv2, conv3 = OBConversion(), OBConversion(), OBConversion()
-    conv1.SetInFormat("mol2")
-    conv2.SetInFormat("mol2")
-    conv3.SetInFormat("mol2")
+    conv = OBConversion()
+    conv.SetInFormat("mol2")
 
     protfix  = OBMol()
-    dockprot = OBMol()
-    docklig  = OBMol()
     protref  = OBMol()
     ligref   = OBMol()
+    docklig  = OBMol()
+    dockprot = OBMol()
 
-    conv1.ReadFile(protfix, pbf)
-    conv1.ReadFile(protref, pr)
-    conv1.ReadFile(ligref, lr)
-    dockprottemp = conv2.ReadFile(dockprot, dp)
-    dockligtemp  = conv3.ReadFile(docklig,  dl)
-
+    conv.ReadFile(protfix, pbf)
+    conv.ReadFile(protref, protein_reference)
+    conv.ReadFile(ligref, ligand_reference)
+    
     refresdict    = getresiduedict(protref)
-    fixresdict    = getresiduedict(protfix)
     refringdict   = getringdict(protref)
-    fixringdict   = getringdict(protfix)
-
-    a = time()
-    print "Time needed for preparation is %.3f s." % (a-x)
-    ringinteraction(refresdict, refringdict, residuechoice, protref, ligref)
-    ringinteraction(fixresdict, fixringdict, residuechoice, protfix, docklig)
     
-    b = time()
-    print "Time needed for identifying pi-interactions is %.3f s." % (b-a)
+
+    ringinteraction(refresdict, refringdict, residue_of_choice, protref, ligref)
+    otherinteractions(refresdict, residue_of_choice, protref, ligref)
     
-    otherinteractions(refresdict, residuechoice, protref, ligref)
-    otherinteractions(fixresdict, residuechoice, protfix, docklig)
-    hbonddockprot(fixresdict, residuechoice, dockprot, docklig)
-
-    c = time()
-    print "Time needed for identifying other interactions is %.3f s." % (c-b)
-
-
-    if multiconf == "yes":
-        dockprotconf = []
-        dockligconf  = []
-        while dockligtemp:
-            dockprotconf.append(dockprot)
-            dockligconf.append(docklig)
-            dockprot = OBMol()
-            docklig  = OBMol()
-            dockprottemp = conv2.Read(dockprot)
-            dockligtemp  = conv3.Read(docklig)
-
-        confnum = 1
-        for confp, confl in zip(dockprotconf, dockligconf):
-            print "test"
     
-    tc = gettcfromdict(refresdict, fixresdict, residuechoice)
+    conf_number = len(glob(protein_ligand_folder+'/'+mollist[0]+'*protein.mol2')) 
     
-    print "        %s %s" % (ligref.GetTitle()[:10], docklig.GetTitle()[:10])
-    for residue in residuechoice:
-        print residue, " %s  %s" % (str(refresdict[residue])[10:-2], str(fixresdict[residue])[10:-2])
-    print "Tanimoto Coefficient: %.3f" % tc
+    cvsoutdict = {}
+    bitarraydict = {}
+    for compound in mollist:
+        cvsoutdict[compound] = []
+        bitarraydict[compound] = []
+        for conf in range(conf_number):
+            conf += 1
+            fixringdict   = getringdict(protfix)
+            fixresdict    = getresiduedict(protfix)
+
+            base_name = protein_ligand_folder + '/' + compound + '_entry_00001_conf_' + str(conf).zfill(2)
+            ligand_file = base_name + '.mol2'
+            protein_file = base_name + '_protein.mol2'
+            conv.ReadFile(docklig, ligand_file)
+            conv.ReadFile(dockprot, protein_file)
+            ringinteraction(fixresdict, fixringdict, residue_of_choice, protfix, docklig)
+            otherinteractions(fixresdict, residue_of_choice, protfix, docklig)
+            hbonddockprot(fixresdict, residue_of_choice, dockprot, docklig)
+
+            tc = gettcfromdict(refresdict, fixresdict, residue_of_choice)
+            stringbit = collectbit(fixresdict, residue_of_choice)
+            cvsoutdict[compound].append(tc)
+            bitarraydict[compound].append(stringbit)
+    
+
+    outfile = open(output_file, 'w')
+    for compound in cvsoutdict:
+        outfile.write(compound.ljust(16))
+        for tc in cvsoutdict[compound]:
+            outfile.write(" %.3f" % tc)
+        for stringbit in bitarraydict[compound]:
+            outfile.write(" %s" % stringbit)
+        outfile.write('\n')
                     
+    outfile.close()
     y = time()
     print 'Total time taken %.3f s.' % (y-x)
 
