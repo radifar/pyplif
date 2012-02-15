@@ -8,6 +8,7 @@ else
         rm -r $HOME/.pyplif
     fi
     cp -r pyplif $HOME/.pyplif
+    chmod +x $HOME/.pyplif/pyplif.py
     echo "alias pyplif='$HOME/.pyplif/pyplif.py'" >> $HOME/.bashrc
     echo "PyPLIF successfully installed"
 fi
