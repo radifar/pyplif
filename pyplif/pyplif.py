@@ -56,7 +56,7 @@ if __name__ == "__main__":
 	try:
 		os.chdir(protein_ligand_folder)
 		mollisttemp = glob('*conf_01.mol2')
-		mollist = [mol.split('_')[0] for mol in mollisttemp]
+		mollist = [mol.split('_entry')[0] for mol in mollisttemp]
 		mollist.sort()
 		os.chdir('..')
 		pbf = protein_ligand_folder + '/protein_bindingsite_fixed.mol2'
@@ -91,9 +91,11 @@ if __name__ == "__main__":
 
 	cvsoutdict = {}
 	bitarraydict = {}
+	filelist = {}
 	for compound in mollist:
 		cvsoutdict[compound] = []
 		bitarraydict[compound] = []
+		filelist[compound] = []
 		for conf in range(conf_number):
 			conf += 1
 			fixringdict   = getringdict(protfix)
@@ -112,20 +114,21 @@ if __name__ == "__main__":
 			stringbit = collectbit(fixresdict, residue_of_choice)
 			cvsoutdict[compound].append(tc)
 			bitarraydict[compound].append(stringbit)
+			filelist[compound].append(ligand_file)
     
 	refstringbit = collectbit(refresdict, residue_of_choice)
 	
 	outfile = open(output_file, 'w')
-	outfile.write("                   ")
+	outfile.write("                                                            ")
 	for res in residue_of_choice:
 		outfile.write(res.ljust(7))
 	outfile.write('\n')
-	outfile.write(ligref.GetTitle().ljust(18))
+	outfile.write(ligref.GetTitle().ljust(60))
 	outfile.write(" %s" % refstringbit)
 	outfile.write('\n')
 	for compound in cvsoutdict:
-		for stringbit, tc in zip(bitarraydict[compound], cvsoutdict[compound]):
-			outfile.write(compound.ljust(18))
+		for filename, stringbit, tc in zip(filelist[compound], bitarraydict[compound], cvsoutdict[compound]):
+			outfile.write(filename.ljust(60))
 			outfile.write(" %s" % stringbit)
 			outfile.write(" %.3f" % tc)
 			outfile.write('\n')
