@@ -1,0 +1,68 @@
+Installing Dependencies
+-----------------------
+
+Before you install PyPLIF there are few dependencies you need to install:
+
+* Python >= 2.6
+* Open Babel (library) >= 2.2
+* Python-OpenBabel >= 1.6
+* Python-BitArray
+* Python-Numpy >= 1.3
+
+Here's the instruction to install those dependencies on Ubuntu, there's
+also the instruction for Fedora below.
+
+In Ubuntu you can simply enter these commands to install those
+dependencies (python already installed in Ubuntu & Fedora):
+
+sudo apt-get install openbabel
+sudo apt-get install python-openbabel
+sudo apt-get install python-bitarray
+sudo apt-get install python-numpy
+
+Now, unfortunately for Ubuntu < 11.04 don't have python-bitarray package,
+so you have to install it manually by downloading bitarray
+from <http://pypi.python.org/pypi/bitarray> then install python-dev:
+
+sudo apt-get install python-dev
+
+then unpack the bitarray module and run the setup.py from the extracted
+folder like so:
+
+sudo python setup.py install
+
+Now in Fedora you can enter these commands:
+
+sudo yum install openbabel
+sudo yum install python-openbabel
+sudo yum install python-bitarray
+sudo yum install numpy
+
+These steps has proven to be working on Fedora 16. If some step ain't working
+then Google is your friend :)
+
+
+Installation
+------------
+
+After all of the dependencies installed, you can install PyPLIF by opening
+the terminal and enter the PyPLIF directory and run setup.sh like so:
+
+./setup.sh
+
+If PyPLIF installed successfully then a message like 'PyPLIF successfully
+installed' should appear. When PyPLIF is already installed and you're running
+setup.sh a message like 'PyPLIF is already installed' will appear.
+
+If you would like to install newer version of PyPLIF and overwrite the old
+one then all you need to do is by adding 'force' option to setup.sh like so:
+
+./setup.sh force
+
+
+Uninstallation
+--------------
+
+You can uninstall PyPLIF simply by entering this command:
+
+./setup.sh uninstall

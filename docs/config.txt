@@ -1,0 +1,6 @@
+protein_reference H1_site.mol2
+ligand_reference Doxepin.mol2
+
+protein_ligand_folder H1_retro
+residue_of_choice VAL80 TRP103 LEU104 ASP107 TYR108 SER111 THR112 ILE115 TRP158 ILE162 PHE199 PHE424 TRP428 TYR431 PHE432 PHE435 HIS450 ILE454 TRP455 TYR458 ASN460
+output_file H1_ifp.csv
