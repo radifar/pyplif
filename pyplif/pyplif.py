@@ -117,18 +117,19 @@ if __name__ == "__main__":
 	refstringbit = collectbit(refresdict, residue_of_choice)
 	
 	outfile = open(output_file, 'w')
-	outfile.write("".ljust(61))
+	outfile.write("".ljust(71))
 	for res in residue_of_choice:
 		outfile.write(res.ljust(7))
 	outfile.write('\n')
-	outfile.write(ligand_reference.ljust(60))
+	outfile.write(ligand_reference.ljust(70))
 	outfile.write(" %s" % refstringbit)
 	outfile.write('\n')
 	for compound in mollist:
+		total_score = mollisttemp[mollist.index(compound)].split(',')[1]
 		outfile.write(filelist[compound].ljust(60))
+		outfile.write(" %s" % total_score.ljust(9) )
 		outfile.write(" %s" % bitarraydict[compound])
 		outfile.write(" %.3f" % cvsoutdict[compound])
-		outfile.write(" %s" % mollisttemp[mollist.index(compound)].split(',')[1] )
 		outfile.write('\n')
                     
 	outfile.close()
