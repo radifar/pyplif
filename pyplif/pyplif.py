@@ -4,7 +4,6 @@ import getopt, sys, os
 from openbabel import OBMol, OBConversion
 from optparse import OptionParser
 from time import time
-from glob import glob
 from tanimoto_coef import *
 from ring import *
 from interactions import *
@@ -12,8 +11,7 @@ from interactions import *
 
 if __name__ == "__main__":
 	x = time()
-    
-
+  
 	#  Default configuration
 	config    = "config.txt"
 
@@ -29,6 +27,13 @@ if __name__ == "__main__":
 					  help="read config from FILE", metavar="FILE")
 	parser.add_option("-o", "--output", dest="output_file",
 					  help="write result to FILE", metavar="FILE")
+	(options_parser, args) = parser.parse_args()
+	
+	#  Use the config file from the command option instead
+	#  when it is supplied through command option.
+	if options_parser.config:
+		config = options_parser.config
+	
 	try:
 		configread  = open(config, 'r')
 	except:
@@ -52,20 +57,25 @@ if __name__ == "__main__":
 			protein_ligand_folder = options[1]
 		if options[0] == "output_file":
 			output_file = options[1]
-
+	
+	if options_parser.output_file:
+		output_file = options_parser.output_file
+	
 	try:
 		os.chdir(protein_ligand_folder)
-		mollisttemp = glob('*conf_01.mol2')
-		mollist = [mol.split('_entry')[0] for mol in mollisttemp]
-		mollist.sort()
+		conflist = open('features.csv', 'r')
+		firstline = conflist.readline()
+		mollisttemp = [line for line in conflist]
+		mollist = [mol.split(',')[0] for mol in mollisttemp]
 		os.chdir('..')
-		pbf = protein_ligand_folder + '/protein_bindingsite_fixed.mol2'
+
 	except:
 		print 'The protein ligand folder can not be found'
 		sys.exit(1)
             
 
 	# opening the molecule files
+	pbf = protein_ligand_folder + '/protein_bindingsite_fixed.mol2'
 	conv = OBConversion()
 	conv.SetInFormat("mol2")
 
@@ -81,65 +91,47 @@ if __name__ == "__main__":
     
 	refresdict    = getresiduedict(protref)
 	refringdict   = getringdict(protref)
-
+	fixringdict   = getringdict(protfix)
 
 	ringinteraction(refresdict, refringdict, residue_of_choice, protref, ligref)
-	otherinteractions(refresdict, residue_of_choice, protref, ligref)
-
-
-	conf_number = len(glob(protein_ligand_folder+'/'+mollist[0]+'*protein.mol2')) 
+	otherinteractions(refresdict, residue_of_choice, protref, ligref) 
 
 	cvsoutdict = {}
 	bitarraydict = {}
 	filelist = {}
 	for compound in mollist:
-		cvsoutdict[compound] = []
-		bitarraydict[compound] = []
-		filelist[compound] = []
-		for conf in range(conf_number):
-			conf += 1
-			fixringdict   = getringdict(protfix)
-			fixresdict    = getresiduedict(protfix)
+		fixresdict    = getresiduedict(protfix)
 
-			base_name = protein_ligand_folder + '/' + compound + '_entry_00001_conf_' + str(conf).zfill(2)
-			ligand_file = base_name + '.mol2'
-			protein_file = base_name + '_protein.mol2'
-			conv.ReadFile(docklig, ligand_file)
-			conv.ReadFile(dockprot, protein_file)
-			ringinteraction(fixresdict, fixringdict, residue_of_choice, protfix, docklig)
-			otherinteractions(fixresdict, residue_of_choice, protfix, docklig)
-			hbonddockprot(fixresdict, residue_of_choice, dockprot, docklig)
+		ligand_file = protein_ligand_folder + '/' + compound + '.mol2'
+		protein_file = protein_ligand_folder + '/' + compound + '_protein.mol2'
+		conv.ReadFile(docklig, ligand_file)
+		conv.ReadFile(dockprot, protein_file)
+		ringinteraction(fixresdict, fixringdict, residue_of_choice, protfix, docklig)
+		otherinteractions(fixresdict, residue_of_choice, protfix, docklig)
+		hbonddockprot(fixresdict, residue_of_choice, dockprot, docklig)
 
-			tc = gettcfromdict(refresdict, fixresdict, residue_of_choice)
-			stringbit = collectbit(fixresdict, residue_of_choice)
-			cvsoutdict[compound].append(tc)
-			bitarraydict[compound].append(stringbit)
-			filelist[compound].append(ligand_file)
+		cvsoutdict[compound]   = gettcfromdict(refresdict, fixresdict, residue_of_choice)
+		bitarraydict[compound] = collectbit(fixresdict, residue_of_choice)
+		filelist[compound]     = ligand_file
     
 	refstringbit = collectbit(refresdict, residue_of_choice)
 	
 	outfile = open(output_file, 'w')
-	outfile.write("                                                            ")
+	outfile.write("".ljust(61))
 	for res in residue_of_choice:
 		outfile.write(res.ljust(7))
 	outfile.write('\n')
-	outfile.write(ligref.GetTitle().ljust(60))
+	outfile.write(ligand_reference.ljust(60))
 	outfile.write(" %s" % refstringbit)
 	outfile.write('\n')
-	for compound in cvsoutdict:
-		for filename, stringbit, tc in zip(filelist[compound], bitarraydict[compound], cvsoutdict[compound]):
-			outfile.write(filename.ljust(60))
-			outfile.write(" %s" % stringbit)
-			outfile.write(" %.3f" % tc)
-			outfile.write('\n')
-
-#        for tc in cvsoutdict[compound]:
+	for compound in mollist:
+		outfile.write(filelist[compound].ljust(60))
+		outfile.write(" %s" % bitarraydict[compound])
+		outfile.write(" %.3f" % cvsoutdict[compound])
+		outfile.write(" %s" % mollisttemp[mollist.index(compound)].split(',')[1] )
+		outfile.write('\n')
                     
 	outfile.close()
 	y = time()
 	print 'Total time taken %.3f s.' % (y-x)
-
-
-
-
 
