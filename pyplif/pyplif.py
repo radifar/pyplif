@@ -66,7 +66,11 @@ if __name__ == "__main__":
 		conflist = open('features.csv', 'r')
 		firstline = conflist.readline()
 		mollisttemp = [line for line in conflist]
-		mollist = [mol.split(',')[0] for mol in mollisttemp]
+		mollist   = []
+		scorelist = []
+		for mol in mollisttemp:
+			mollist.append(mol.split(',')[0])
+			scorelist.append(mol.split(',')[1])
 		os.chdir('..')
 
 	except:
@@ -117,19 +121,18 @@ if __name__ == "__main__":
 	refstringbit = collectbit(refresdict, residue_of_choice)
 	
 	outfile = open(output_file, 'w')
-	outfile.write("".ljust(71))
+	outfile.write("".ljust(78))
 	for res in residue_of_choice:
 		outfile.write(res.ljust(7))
 	outfile.write('\n')
-	outfile.write(ligand_reference.ljust(70))
+	outfile.write(ligand_reference.ljust(77))
 	outfile.write(" %s" % refstringbit)
 	outfile.write('\n')
-	for compound in mollist:
-		total_score = mollisttemp[mollist.index(compound)].split(',')[1]
+	for compound, score in zip(mollist, scorelist):
 		outfile.write(filelist[compound].ljust(60))
-		outfile.write(" %s" % total_score.ljust(9) )
+		outfile.write(" %s" % score.ljust(9) )
+		outfile.write(" %.3f " % cvsoutdict[compound])
 		outfile.write(" %s" % bitarraydict[compound])
-		outfile.write(" %.3f" % cvsoutdict[compound])
 		outfile.write('\n')
                     
 	outfile.close()
