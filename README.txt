@@ -10,6 +10,11 @@ Autodock and Autodock Vina.
 Unfortunately the current version is specially designed for analyzing the
 docking results from PLANTS <http://www.tcd.uni-konstanz.de/research/plants.php>
 
+If you use this program for your work please include the following reference:
+Radifar, M., 2012, PyPLIF version 0.1 beta, http://code.google.com/p/pyplif/ (accessed date).
+
+Replace date with the date when you download this program.
+
 
 Installation
 ------------
@@ -63,8 +68,10 @@ Tutorial
 Before you start makes sure that SPORES (http://www.tcd.uni-konstanz.de/research/spores.php)
 is already installed in your computer.
 
-This tutorial is based on the ''
-research (http://pubs.acs.org/doi/abs/10.1021/jm2011589)
+This tutorial is based on the paper 'Crystal Structure-Based Virtual Screening for
+Fragment-like Ligands of the Human Histamine H1 Receptor' (http://pubs.acs.org/doi/abs/10.1021/jm2011589)
+The ligands used in this tutorial is taken from the SMILES from the supplementary
+information of that paper.
 
 First go to docs/ligands folder and run smitomol2.sh:
 
