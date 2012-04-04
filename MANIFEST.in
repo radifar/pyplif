@@ -1,2 +1,11 @@
 include LICENSE.txt
+include INSTALL.txt
 include setup.sh
+include docs/config.txt
+include docs/plants.conf
+include docs/H1_protein.mol2
+include docs/H1_site.mol2
+include docs/Doxepin.mol2
+include docs/ligands/smitomol2.sh
+include docs/ligands/CNS_actives_less.smi
+include docs/ligands/Decoys_less.smi
