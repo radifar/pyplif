@@ -64,19 +64,20 @@ if __name__ == "__main__":
 	try:
 		os.chdir(protein_ligand_folder)
 		conflist = open('features.csv', 'r')
-		firstline = conflist.readline()
-		mollisttemp = [line for line in conflist]
-		mollist   = []
-		scorelist = []
-		for mol in mollisttemp:
-			mollist.append(mol.split(',')[0])
-			scorelist.append(mol.split(',')[1])
-		os.chdir('..')
 
 	except:
 		print 'The protein ligand folder can not be found'
 		sys.exit(1)
             
+
+	firstline = conflist.readline()
+	mollisttemp = [line for line in conflist]
+	mollist   = []
+	scorelist = []
+	for mol in mollisttemp:
+		mollist.append(mol.split(',')[0])
+		scorelist.append(mol.split(',')[1])
+	os.chdir('..')
 
 	# opening the molecule files
 	pbf = protein_ligand_folder + '/protein_bindingsite_fixed.mol2'
