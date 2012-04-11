@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import getopt, sys, os
+import getopt, sys, os, copy
 from openbabel import OBMol, OBConversion
 from optparse import OptionParser
 from time import time
@@ -104,9 +104,9 @@ if __name__ == "__main__":
 	cvsoutdict = {}
 	bitarraydict = {}
 	filelist = {}
+	fixresdict_template = getresiduedict(protfix)
 	for compound in mollist:
-		fixresdict    = getresiduedict(protfix)
-
+		fixresdict = copy.deepcopy(fixresdict_template)
 		ligand_file = protein_ligand_folder + '/' + compound + '.mol2'
 		protein_file = protein_ligand_folder + '/' + compound + '_protein.mol2'
 		conv.ReadFile(docklig, ligand_file)
