@@ -9,7 +9,6 @@ if [ $1 > 0 ]  ; then
             rm -r $HOME/.pyplif
             gawk '$0 !~/alias pyplif/ { print $0 }' $HOME/.bashrc > .bashrc.tmp
             cat .bashrc.tmp > $HOME/.bashrc
-            rm .bashrc.tmp
             echo "PyPLIF has been successfully uninstalled"
         else
             echo "PyPLIF never been installed before"
