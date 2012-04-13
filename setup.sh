@@ -28,7 +28,9 @@ if [ $1 > 0 ]  ; then
     fi
 else  
     if  `cat $HOME/.bashrc | grep 'pyplif'`; then
-        echo "PyPLIF is already installed"
+        echo "PyPLIF installation failed because PyPLIF is already installed"
+        echo "Use option 'force' to overwrite the old installation:"
+        echo "./setup.sh force"
         exit
     else
         if [ -e $HOME/.pyplif ]; then
