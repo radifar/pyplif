@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup(name='PyPLIF',
-    version='0.1a2',
+    version='0.1',
     author='Muhammad Radifar',
     author_email='m.radifar05@gmail.com',
     packages=['pyplif'],
@@ -9,7 +9,7 @@ setup(name='PyPLIF',
     description=['PyPLIF is a program/script written in Python to analyze protein-ligand interaction from the molecular docking result'],
     long_description=open('README.txt').read(),
     classifiers=[
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
