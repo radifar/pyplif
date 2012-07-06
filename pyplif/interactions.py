@@ -6,10 +6,12 @@ from ring import *
 from atom_property import *
 from bitarray import bitarray
 
-def getresiduedict(protein):
+def getresiduedict(protein, residuechoice):
 	resdict = {}
 	for residue in OBResidueIter(protein):
 		resdict[residue.GetName()] = bitarray('0000000')
+	for residue in residuechoice:
+		resdict[residue] = bitarray('0000000')
 	return resdict
 
 def ringinteraction(resdict, ringdict, residuechoice, protein, ligand):

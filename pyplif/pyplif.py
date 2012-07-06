@@ -97,7 +97,7 @@ if __name__ == "__main__":
 	conv.ReadFile(protref, protein_reference)
 	conv.ReadFile(ligref, ligand_reference)
     
-	refresdict    = getresiduedict(protref)
+	refresdict    = getresiduedict(protref, residue_of_choice)
 	refringdict   = getringdict(protref)
 	fixringdict   = getringdict(protfix)
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 	cvsoutdict = {}
 	bitarraydict = {}
 	filelist = {}
-	fixresdict_template = getresiduedict(protfix)
+	fixresdict_template = getresiduedict(protfix, residue_of_choice)
 	for compound in mollist:
 		fixresdict = copy.deepcopy(fixresdict_template)
 		ligand_file = protein_ligand_folder + '/' + compound + '.mol2'
