@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import getopt, sys, os, copy
+import getopt, sys, os, copy, glob
 from openbabel import OBMol, OBConversion
 from optparse import OptionParser
 from time import time
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 					  help="write result to FILE", metavar="FILE")
 	parser.add_option("-a", "--autocharge", dest="autocharge",
 						help="assign formal charge with open babel")
-						
+	
 	(options_parser, args) = parser.parse_args()
 	
 	#  Use the config file from the command option instead
@@ -110,8 +110,12 @@ if __name__ == "__main__":
 	fixresdict_template = getresiduedict(protfix, residue_of_choice)
 	for compound in mollist:
 		fixresdict = copy.deepcopy(fixresdict_template)
-		ligand_file = protein_ligand_folder + '/' + compound + '.mol2'
-		protein_file = protein_ligand_folder + '/' + compound + '_protein.mol2'
+		os.chdir(protein_ligand_folder)
+		molname = glob.glob('*' + compound.split('_entry')[1] + '*')
+		os.chdir('..')
+		molname.sort()
+		ligand_file = protein_ligand_folder + '/' + molname[0]
+		protein_file = protein_ligand_folder + '/' + molname[1]
 		conv.ReadFile(docklig, ligand_file)
 		conv.ReadFile(dockprot, protein_file)
 		ringinteraction(fixresdict, fixringdict, residue_of_choice, protfix, docklig)
