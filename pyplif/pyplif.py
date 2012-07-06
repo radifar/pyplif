@@ -27,6 +27,9 @@ if __name__ == "__main__":
 					  help="read config from FILE", metavar="FILE")
 	parser.add_option("-o", "--output", dest="output_file",
 					  help="write result to FILE", metavar="FILE")
+	parser.add_option("-a", "--autocharge", dest="autocharge",
+						help="assign formal charge with open babel")
+						
 	(options_parser, args) = parser.parse_args()
 	
 	#  Use the config file from the command option instead
