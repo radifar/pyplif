@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import getopt, sys, os, copy, glob
-from openbabel import OBMol, OBConversion
 from optparse import OptionParser
+
+from openbabel import OBMol, OBConversion
+
 from time import time
 from tanimoto_coef import *
 from ring import *
