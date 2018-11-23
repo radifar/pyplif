@@ -13,17 +13,9 @@ from interactions import *
 
 if __name__ == "__main__":
 	x = time()
-  
-	#  Default configuration
-	config    = "config.txt"
-
-	#  Identifiers initialization
-	protein_reference = ""
-	ligand_reference = ""
-	residue_of_choice = []
-	protein_ligand_folder = ""
-	output_file = ""
-
+	
+	from initialize_data import *
+	
 	parser = OptionParser()
 	parser.add_option("-c", "--config", dest="config",
 					  help="read config from FILE", metavar="FILE")
